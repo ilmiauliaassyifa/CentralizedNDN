@@ -164,6 +164,8 @@ async def main():
                          if len(faces[k]) == 4:
                               if faces[k][3] == "controller":
                                    continue
+                              elif faces[k][3] == "":
+                                   continue
                               temp[faces[k][3]] = 1
                     graph[facelist[v][3]] = temp
 
