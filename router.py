@@ -90,18 +90,34 @@ async def main():
                             if len(facelist[v]) == 3 :
                                 facelist[v].append(bytes(content).decode())
                             else :
-                                facelist[v][4] = bytes(content).decode()
+                                facelist[v][3] = bytes(content).decode()
                             nf[bytes(content).decode()] = v
                             print(v, facelist[v])
 
                         except InterestNack as e:
                             print(f'Nacked with reason={e.reason}')
+                            if len(facelist[v]) == 3 :
+                                facelist[v].append("")
+                            else :
+                                facelist[v][3] = ""
                         except InterestTimeout:
-                           print(f'Timeout')
+                            print(f'Timeout')
+                            if len(facelist[v]) == 3 :
+                                facelist[v].append("")
+                            else :
+                                facelist[v][3] = ""
                         except InterestCanceled:
-                           print(f'Canceled')
+                            print(f'Canceled')
+                            if len(facelist[v]) == 3 :
+                                facelist[v].append("")
+                            else :
+                                facelist[v][3] = ""
                         except ValidationFailure:
-                           print(f'Data failed to validate')
+                            print(f'Data failed to validate')
+                            if len(facelist[v]) == 3 :
+                                facelist[v].append("")
+                            else :
+                                facelist[v][3] = ""
                 time.sleep(60)
 
 @app.route('/hello')
