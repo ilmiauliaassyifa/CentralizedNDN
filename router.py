@@ -25,6 +25,7 @@ import subprocess
 import logging
 import random, string
 import json
+import time
 
 
 logging.basicConfig(format='[{asctime}]{levelname}:{message}',
@@ -72,36 +73,36 @@ for v in facelist:
     process = subprocess.Popen(nfdc_route_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     process.wait()
 async def main():
-        for v in facelist:
-                print()
-                if not ':6363' in facelist[v][0] or not ':6363' in facelist[v][1]:
-                        continue
-                try:
-                    timestamp = ndn.utils.timestamp()
-                    name = Name.from_str('/hello') + [Component.from_timestamp(timestamp)]
-                    print(f'Sending Interest {Name.to_str(name)}, {InterestParam(must_be_fresh=True, lifetime=6000, forwarding_hint=[Name.from_str("/276")])}')
-                    data_name, meta_info, content = await app.express_interest(
-                        name, must_be_fresh=True, can_be_prefix=False, lifetime=6000, forwarding_hint=[[1,facelist[v][2]],[2,"hello"]])
+        while True:  
+                for v in facelist:
+                        if not ':6363' in facelist[v][0] or not ':6363' in facelist[v][1]:
+                            continue
+                        try:
+                            timestamp = ndn.utils.timestamp()
+                            name = Name.from_str('/hello') + [Component.from_timestamp(timestamp)]
+                            print(f'Sending Interest {Name.to_str(name)}, {InterestParam(must_be_fresh=True, lifetime=6000, forwarding_hint=[Name.from_str("/276")])}')
+                            data_name, meta_info, content = await app.express_interest(
+                                name, must_be_fresh=True, can_be_prefix=False, lifetime=6000, forwarding_hint=[[1,facelist[v][2]],[2,"hello"]])
 
-                    print(f'Received Data Name: {Name.to_str(data_name)}')
-                    print(meta_info)
-                    print(bytes(content) if content else None)
-                    facelist[v].append(bytes(content).decode())
-                    nf[bytes(content).decode()] = v
-                    print(v, facelist[v])
+                            print(f'Received Data Name: {Name.to_str(data_name)}')
+                            print(meta_info)
+                            print(bytes(content) if content else None)
+                            if len(facelist[v]) == 3 :
+                                facelist[v].append(bytes(content).decode())
+                            else :
+                                facelist[v][4] = bytes(content).decode()
+                            nf[bytes(content).decode()] = v
+                            print(v, facelist[v])
 
-                except InterestNack as e:
-                    print(f'Nacked with reason={e.reason}')
-                except InterestTimeout:
-                   print(f'Timeout')
-                except InterestCanceled:
-                   print(f'Canceled')
-                except ValidationFailure:
-                   print(f'Data failed to validate')
-
-        with open('face.txt', 'w') as json_file:
-                json.dump(facelist, json_file)
-
+                        except InterestNack as e:
+                            print(f'Nacked with reason={e.reason}')
+                        except InterestTimeout:
+                           print(f'Timeout')
+                        except InterestCanceled:
+                           print(f'Canceled')
+                        except ValidationFailure:
+                           print(f'Data failed to validate')
+                time.sleep(60)
 
 @app.route('/hello')
 def on_interest(name: FormalName, param: InterestParam, _app_param: Optional[BinaryStr]):
