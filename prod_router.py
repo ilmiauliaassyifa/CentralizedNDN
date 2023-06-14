@@ -36,6 +36,9 @@ logging.basicConfig(format='[{asctime}]{levelname}:{message}',
 
 app = NDNApp()
 
+async def main():
+   print("RUN")
+
 @app.route('/hello')
 def on_interest(name: FormalName, param: InterestParam, _app_param: Optional[BinaryStr]):
     print(f'>> I: {Name.to_str(name)}, {param}')
