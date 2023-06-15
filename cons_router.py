@@ -118,6 +118,8 @@ async def main():
                                 facelist[v].append("")
                             else :
                                 facelist[v][3] = ""
+                with open('face.txt', 'w') as json_file:
+                    json.dump(facelist, json_file)
                 time.sleep(60)
 
 if __name__ == '__main__':
