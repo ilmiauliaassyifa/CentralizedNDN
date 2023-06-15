@@ -62,7 +62,6 @@ def on_interest(name: FormalName, param: InterestParam, _app_param: Optional[Bin
 
 @app.route('/updateroute')
 def on_interest(name: FormalName, param: InterestParam, ap):
-    global myprefix
     
     nr = str(bytes(ap))
     print(f'>> I: {Name.to_str(name)}, {param}, {bytes(ap)}') 
@@ -73,7 +72,8 @@ def on_interest(name: FormalName, param: InterestParam, ap):
     print(f'Content: (size: {len(content)})')
     nr = nr.split(",")
     #myprefix[nr[0].split("'")[1]]= nr[1].split("'")[0]
-    print(myprefix)
+    with open('nf.txt') as json_file:
+        nf = json.load(json_file)
     nfdc_routeupdate_cmd = ['nfdc','route','add',nr[1].split("'")[0],'nexthop',nf[nr[0].split("'")[1]],'cost',nr[2].split("'")[0]]
 
     process = subprocess.Popen(nfdc_routeupdate_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
